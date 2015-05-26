@@ -1,23 +1,18 @@
 package framework;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
+import net.sf.json.JSONObject;
+
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
-import net.sf.json.JSONObject;
 import testcase.TestCase;
 
 public class TestFramework {
@@ -50,7 +45,7 @@ public class TestFramework {
 	public void addSchoolInfo(JSONObject schoolInfo) throws IOException {
 		String uri = host + "/addSchoolInfo";
 		if (schoolInfo == null) {
-			schoolInfo = randomSchoolInfo();
+			schoolInfo = RandomGenerator.randomSchoolInfo();
 		}
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost(uri);
@@ -60,12 +55,21 @@ public class TestFramework {
 			requestEntity = new StringEntity(schoolInfo.toString());
 			httpPost.setEntity(requestEntity);
 			response = httpClient.execute(httpPost);
-			HttpEntity responseEntity = response.getEntity();
-			InputStream is = responseEntity.getContent();
-			byte[] content = new byte[is.available()];
-			is.read(content);
-			String s = new String(content);
 			
+			HttpEntity responseEntity = response.getEntity();
+			JSONObject result = JSONObject.fromObject(EntityUtils.toString(responseEntity, "UTF-8"));
+			
+			boolean success = result.getBoolean("success");
+			String failReason = result.getString("failReason:");
+			if (success) {
+				if (failReason.equals("")) {
+					System.out.println("SUCCESS");
+				}
+			}else if (failReason.equals("院系名称已存在")) {
+				System.out.println("DUPLICATE");
+			}else {
+				System.out.println("EXCEPTION");
+			}
 		}  catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -73,11 +77,6 @@ public class TestFramework {
 				response.close();
 			}
 		}
-	}
-	
-	private JSONObject randomSchoolInfo() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public void setTests(List<TestCase> tests) {
@@ -88,4 +87,15 @@ public class TestFramework {
 		this.host = "http://" + serverIp;
 	}
 	
+	
+	public static void main(String[] args) {
+		TestFramework framework = new TestFramework();
+		framework.setServerIp("localhost:8080/EasyServer");
+		try {
+			framework.addSchoolInfo(null);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
