@@ -2,18 +2,22 @@ package testcase;
 
 public abstract class TestCase {
 	
-	protected int threadNum;
+	private int threadNum;
+	
+	protected TestCase(int threadNum){
+		this.threadNum = threadNum;
+	}
 
-	public abstract void setUp();
+	public void setUp(){
+	}
 	
 	public abstract void run();
+	
+	public void tearDown() {
+	}
 	
 	public int getThreadNum() {
 		return threadNum;
 	}
 
-	public void setThreadNum(int threadNum) {
-		this.threadNum = threadNum;
-	}
-	
 }

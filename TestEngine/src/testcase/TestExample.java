@@ -3,16 +3,15 @@ package testcase;
 
 public class TestExample extends TestCase {
 
-	@Override
-	public void setUp() {
-		// TODO Auto-generated method stub
-
+	protected TestExample(int threadNum) {
+		super(threadNum);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }
