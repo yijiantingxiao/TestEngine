@@ -1,17 +1,15 @@
 package testcase;
 
-
 public class TestExample extends TestCase {
 
-	protected TestExample(int threadNum) {
+	public TestExample(int threadNum) {
 		super(threadNum);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		
+		EasyClient client = new EasyClient("localhost:8080/EasyServer");
+		client.addSchoolInfo(null);
 	}
 
 }
