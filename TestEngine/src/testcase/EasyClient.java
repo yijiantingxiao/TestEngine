@@ -2,6 +2,7 @@ package testcase;
 
 import java.io.IOException;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.http.HttpEntity;
@@ -12,6 +13,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import beans.AddResponse;
+import beans.CourseInfo;
+import beans.SchoolInfo;
+import beans.StudentInfo;
+import beans.Time;
 import framework.RandomGenerator;
 
 public class EasyClient {
@@ -22,18 +28,21 @@ public class EasyClient {
 		this.host = "http://" + serverAddress;
 	}
 	
-	public void addSchoolInfo(JSONObject schoolInfo){
+	public AddResponse addSchoolInfo(SchoolInfo schoolInfo){
 		String uri = host + "/addSchoolInfo";
+		JSONObject jsonSchoolInfo;
 		if (schoolInfo == null) {
-			schoolInfo = RandomGenerator.randomSchoolInfo();
+			jsonSchoolInfo = RandomGenerator.randomSchoolInfo();
+		} else {
+			jsonSchoolInfo = JSONObject.fromObject(schoolInfo);
 		}
-		System.out.println("addSchoolInfo: " + schoolInfo + ":");
+		System.out.println("addSchoolInfo: " + jsonSchoolInfo + ":");
 		
 		try {
-			JSONObject result = sendRequest(uri, schoolInfo.toString());
+			AddResponse result = (AddResponse) JSONObject.toBean(sendRequest(uri, jsonSchoolInfo.toString()), AddResponse.class);
 			if (result != null) {
-				boolean success = result.getBoolean("success");
-				String failReason = result.getString("failReason");
+				boolean success = result.isSuccess();
+				String failReason = result.getFailReason();
 				if (success) {
 					if (failReason.equals("")) {
 						System.out.println("SUCCESS");
@@ -43,24 +52,30 @@ public class EasyClient {
 				} else {
 					System.out.println("EXCEPTION");
 				}
-			}			
+			}	
+			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
-	public void addCourseInfo(JSONObject course){
+	public AddResponse addCourseInfo(CourseInfo courseInfo){
 		String uri = host + "/addCourseInfo";
-		if (course == null) {
-			course = RandomGenerator.randomCourseInfo();
+		JSONObject jsonCourse;
+		if (courseInfo == null) {
+			jsonCourse = RandomGenerator.randomCourseInfo();
+		} else {
+			jsonCourse = new JSONObject();
+			jsonCourse.accumulate("course", courseInfo);
 		}
-		System.out.println("addCourseInfo: " + course + ":");
+		System.out.println("addCourseInfo: " + jsonCourse + ":");
 		
 		try {
-			JSONObject result = sendRequest(uri, course.toString());
+			AddResponse result = (AddResponse) JSONObject.toBean(sendRequest(uri, jsonCourse.toString()), AddResponse.class);
 			if (result != null) {
-				boolean success = result.getBoolean("success");
-				String failReason = result.getString("failReason");
+				boolean success = result.isSuccess();
+				String failReason = result.getFailReason();
 				if (success) {
 					if (failReason.equals("")) {
 						System.out.println("SUCCESS");
@@ -72,23 +87,28 @@ public class EasyClient {
 					System.out.println("EXCEPTION");
 				}
 			}
+			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
-	public void addStudentInfo(JSONObject studentInfo) {
+	public AddResponse addStudentInfo(StudentInfo studentInfo) {
 		String uri = host + "/addStudentInfo";
+		JSONObject jsonStudentInfo;
 		if (studentInfo == null) {
-			studentInfo = RandomGenerator.randomStudentInfo();
+			jsonStudentInfo = RandomGenerator.randomStudentInfo();
+		} else {
+			jsonStudentInfo = JSONObject.fromObject(studentInfo);
 		}
-		System.out.println("addStudentInfo: " + studentInfo + ":");
+		System.out.println("addStudentInfo: " + jsonStudentInfo + ":");
 		
 		try {
-			JSONObject result = sendRequest(uri, studentInfo.toString());
+			AddResponse result = (AddResponse) JSONObject.toBean(sendRequest(uri, jsonStudentInfo.toString()), AddResponse.class);
 			if (result != null) {
-				boolean success = result.getBoolean("success");
-				String failReason = result.getString("failReason");
+				boolean success = result.isSuccess();
+				String failReason = result.getFailReason();
 				if (success) {
 					if (failReason.equals("")) {
 						System.out.println("SUCCESS");
@@ -99,12 +119,37 @@ public class EasyClient {
 					System.out.println("EXCEPTION");
 				}
 			}
+			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
-	private static JSONObject sendRequest(String uri, String content) throws IOException {
+	public CourseInfo[] queryCourseByTime(Time time) {
+		String uri = host + "/queryCourseByTime";
+		JSONObject jsonTime;
+		if (time == null) {
+			System.out.println("queryCourseByTime: time is null");
+			return null;
+		} else {
+			jsonTime = new JSONObject();
+			jsonTime.accumulate("time", time);
+		}
+		System.out.println("queryCourseByTime: " + jsonTime + ":");
+		
+		try {
+			JSONObject jsonCourses = sendRequest(uri, jsonTime.toString());
+			System.out.println(jsonCourses);
+			CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			return courses;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private JSONObject sendRequest(String uri, String content) throws IOException {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost(uri);
 		CloseableHttpResponse response = null;
