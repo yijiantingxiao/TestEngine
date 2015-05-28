@@ -13,13 +13,14 @@ public class TestFramework {
 		tests = new LinkedList<TestCase>();
 	}
 	
-	public void setUp() {
+	private void setUp() {
 		for (TestCase test : tests) {
 			test.setUp();
 		}
 	}
 	
 	public void start() {		
+		setUp();
 		for (final TestCase test : tests) {
 			int threadNum = test.getThreadNum();
 			Runnable run = new Runnable() {				
@@ -33,9 +34,10 @@ public class TestFramework {
 				thread.start();
 			}
 		}
+		//tearDown();
 	}
 	
-	public void tearDown() {
+	private void tearDown() {
 		for (TestCase test : tests) {
 			test.tearDown();
 		}
