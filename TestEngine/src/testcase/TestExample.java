@@ -2,14 +2,13 @@ package testcase;
 
 public class TestExample extends TestCase {
 
-	public TestExample(int threadNum) {
-		super(threadNum);
+	protected TestExample(String serverAddress, int threadNum) {
+		super(serverAddress, threadNum);
 	}
 
 	@Override
 	public void run() {
-		EasyClient client = new EasyClient("localhost:8080/EasyServer");
-		client.addSchoolInfo(null);
+		getClient().addSchoolInfo(null);
 	}
 
 }

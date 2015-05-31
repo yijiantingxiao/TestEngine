@@ -1,6 +1,6 @@
 package beans;
 
-public class AddResponse {
+public class ServerAnswer {
 
 	private boolean success;
 	private String failReason;
