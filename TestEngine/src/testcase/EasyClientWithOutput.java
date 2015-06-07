@@ -13,18 +13,18 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import beans.ServerAnswer;
 import beans.CourseInfo;
 import beans.SchoolInfo;
-import beans.ServerAnswer;
 import beans.StudentInfo;
 import beans.Time;
 import framework.RandomGenerator;
 
-public class EasyClient {
+public class EasyClientWithOutput {
 
-private String host;
+	private String host;
 	
-	public EasyClient(String serverAddress){
+	public EasyClientWithOutput(String serverAddress){
 		this.host = "http://" + serverAddress;
 	}
 	
@@ -36,9 +36,26 @@ private String host;
 		} else {
 			jsonSchoolInfo = JSONObject.fromObject(schoolInfo);
 		}
+		System.out.println("addSchoolInfo: " + jsonSchoolInfo + ":");
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonSchoolInfo.toString()), ServerAnswer.class);
+			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonSchoolInfo.toString()), ServerAnswer.class);
+			boolean success = result.isSuccess();
+			String failReason = result.getFailReason();
+			if (failReason == null) {
+				System.out.println("Server Error");
+				return null;
+			}
+			if (success) {
+				if (failReason.equals("")) {
+					System.out.println("SUCCESS");
+				}
+			} else if (failReason.equals("院系名称已存在")) {
+				System.out.println(failReason);
+			} else {
+				System.out.println("EXCEPTION");
+			}
+			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -54,9 +71,28 @@ private String host;
 			jsonCourse = new JSONObject();
 			jsonCourse.accumulate("course", courseInfo);
 		}
+		System.out.println("addCourseInfo: " + jsonCourse + ":");
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonCourse.toString()), ServerAnswer.class);
+			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonCourse.toString()), ServerAnswer.class);
+			boolean success = result.isSuccess();
+			String failReason = result.getFailReason();
+			if (failReason == null) {
+				System.out.println("Server Error");
+				return null;
+			}
+			if (success) {
+				if (failReason.equals("")) {
+					System.out.println("SUCCESS");
+				}
+			} else if (failReason.equals("选课号已存在")
+					|| failReason.equals("时间地点冲突")
+					|| failReason.equals("教师时间冲突")) {
+				System.out.println(failReason);
+			} else {
+				System.out.println("EXCEPTION");
+			}
+			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -71,9 +107,26 @@ private String host;
 		} else {
 			jsonStudentInfo = JSONObject.fromObject(studentInfo);
 		}
+		System.out.println("addStudentInfo: " + jsonStudentInfo + ":");
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonStudentInfo.toString()), ServerAnswer.class);
+			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonStudentInfo.toString()), ServerAnswer.class);
+			boolean success = result.isSuccess();
+			String failReason = result.getFailReason();
+			if (failReason == null) {
+				System.out.println("Server Error");
+				return null;
+			}
+			if (success) {
+				if (failReason.equals("")) {
+					System.out.println("SUCCESS");
+				}
+			} else if (failReason.equals("学号已存在") || failReason.equals("院系不存在")) {
+				System.out.println(failReason);
+			} else {
+				System.out.println("EXCEPTION");
+			}
+			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -89,10 +142,13 @@ private String host;
 		
 		JSONObject jsonTime = new JSONObject();
 		jsonTime.accumulate("time", time);
+		System.out.println("queryCourseByTime: " + jsonTime + ":");
 		
 		try {
 			JSONObject jsonCourses = sendRequest(uri, jsonTime.toString());
-			return (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			System.out.println("\t" + courses.length);
+			return courses;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -108,9 +164,16 @@ private String host;
 		
 		JSONObject json = new JSONObject();
 		json.accumulate("courseId", courseId);
+		System.out.println("queryCourseById: " + json + ":");
 
 		try {
-			return (CourseInfo) JSONObject.toBean(sendRequest(uri, json.toString()), CourseInfo.class);
+			CourseInfo courseInfo = (CourseInfo) JSONObject.toBean(sendRequest(uri, json.toString()), CourseInfo.class);
+			if (courseInfo.getCourseId() != null) {
+				System.out.println("\tExist");
+			} else {
+				System.out.println("\tNot Exist");
+			}
+			return courseInfo;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
@@ -126,10 +189,13 @@ private String host;
 		
 		JSONObject json = new JSONObject();
 		json.accumulate("studentId", studentId);
+		System.out.println("querySchedule: " + json + ":");
 
 		try {
 			JSONObject jsonCourses = sendRequest(uri, json.toString());
-			return (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			System.out.println("\t" + courses.length);
+			return courses;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -150,9 +216,29 @@ private String host;
 		JSONObject json = new JSONObject();
 		json.accumulate("courseId", courseId);
 		json.accumulate("studentId:", studentId);
+		System.out.println("selectCourse: " + json + ":");
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			boolean success = result.isSuccess();
+			String failReason = result.getFailReason();
+			if (failReason == null) {
+				System.out.println("Server Error");
+				return null;
+			}
+			if (success) {
+				if (failReason.equals("")) {
+					System.out.println("SUCCESS");
+				}
+			} else if (failReason.equals("学生不存在") || failReason.equals("课程不存在")
+					|| failReason.equals("学分已满")
+					|| failReason.equals("选课时间地点冲突")
+					|| failReason.equals("选课人数已满")) {
+				System.out.println(failReason);
+			} else {
+				System.out.println("EXCEPTION");
+			}
+			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -173,9 +259,26 @@ private String host;
 		JSONObject json = new JSONObject();
 		json.accumulate("courseId", courseId);
 		json.accumulate("studentId", studentId);
+		System.out.println("dropCourse: " + json + ":");
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			boolean success = result.isSuccess();
+			String failReason = result.getFailReason();
+			if (failReason == null) {
+				System.out.println("Server Error");
+				return null;
+			}
+			if (success) {
+				if (failReason.equals("")) {
+					System.out.println("SUCCESS");
+				}
+			} else if (failReason.equals("学生不存在") || failReason.equals("课程不存在") || failReason.equals("学生未选课")) {
+				System.out.println(failReason);
+			} else {
+				System.out.println("EXCEPTION");
+			}
+			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -213,5 +316,5 @@ private String host;
 			}
 		}
 	} 
-	
+
 }

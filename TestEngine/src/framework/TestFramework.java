@@ -13,14 +13,20 @@ public class TestFramework {
 		tests = new LinkedList<TestCase>();
 	}
 	
-	private void setUp() {
+	private boolean setUp() {
 		for (TestCase test : tests) {
-			test.setUp();
+			if (!test.setUp()) {
+				return false;
+			}
 		}
+		return true;
 	}
 	
 	public void start() {		
-		setUp();
+		if (!setUp()) {
+			return;
+		}
+		List<Thread> threads = new LinkedList<Thread>();
 		for (final TestCase test : tests) {
 			int threadNum = test.getThreadNum();
 			Runnable run = new Runnable() {				
@@ -31,10 +37,18 @@ public class TestFramework {
 			};
 			for (int i = 0; i < threadNum; i++) {
 				Thread thread = new Thread(run);
+				threads.add(thread);
 				thread.start();
 			}
 		}
-		//tearDown();
+		for (Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		tearDown();
 	}
 	
 	private void tearDown() {

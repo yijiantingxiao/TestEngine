@@ -10,7 +10,8 @@ public abstract class TestCase {
 		this.threadNum = threadNum;
 	}
 
-	public void setUp(){
+	public boolean setUp(){
+		return true;
 	}
 	
 	public abstract void run();
