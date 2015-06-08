@@ -2,7 +2,6 @@ package examples;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import exception.ServerException;
 import testcase.TestCase;
 import beans.ServerAnswer;
 
@@ -19,14 +18,10 @@ public class TestCaseExample extends TestCase {
 	public void run() {
 		for (int i = 0; i < 1000; i++) {
 			long start = System.currentTimeMillis();
-			ServerAnswer answer = null;
-			try {
-				answer = getClient().addSchoolInfo(null);
-			} catch (ServerException e) {
-			}
+			ServerAnswer answer = getClient().addSchoolInfo(null);
 			long end = System.currentTimeMillis();
 			long time = end - start;
-			if (answer != null && answer.isSuccess()) {
+			if (answer.isSuccess()) {
 				success.getAndIncrement();
 			}
 			updateTime(time);
