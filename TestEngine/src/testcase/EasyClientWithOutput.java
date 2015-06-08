@@ -13,12 +13,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import beans.ServerAnswer;
 import beans.CourseInfo;
 import beans.SchoolInfo;
+import beans.ServerAnswer;
 import beans.StudentInfo;
 import beans.Time;
-import exception.NullParameterException;
 import exception.ServerException;
 import framework.RandomGenerator;
 
@@ -135,11 +134,11 @@ public class EasyClientWithOutput {
 		}
 	}
 	
-	public CourseInfo[] queryCourseByTime(Time time) throws NullParameterException, ServerException {
+	public CourseInfo[] queryCourseByTime(Time time) throws IllegalArgumentException, ServerException {
 		String uri = host + "/queryCourseByTime";
 		if (time == null) {
 			System.out.println("queryCourseByTime: time is null");
-			throw new NullParameterException("queryCourseByTime: time is null");
+			throw new IllegalArgumentException("queryCourseByTime: time is null");
 		}
 		
 		JSONObject jsonTime = new JSONObject();
@@ -161,11 +160,11 @@ public class EasyClientWithOutput {
 		}
 	}
 	
-	public CourseInfo queryCourseById(String courseId) throws NullParameterException, ServerException {
+	public CourseInfo queryCourseById(String courseId) throws IllegalArgumentException, ServerException {
 		String uri = host + "/queryCourseById";
 		if (courseId == null || courseId.equals("")) {
 			System.out.println("queryCourseById: courseId is null or empty");
-			throw new NullParameterException("queryCourseById: courseId is null or empty");
+			throw new IllegalArgumentException("queryCourseById: courseId is null or empty");
 		} 
 		
 		JSONObject json = new JSONObject();
@@ -186,11 +185,11 @@ public class EasyClientWithOutput {
 		}
 	}
 	
-	public CourseInfo[] querySchedule(String studentId) throws NullParameterException, ServerException {
+	public CourseInfo[] querySchedule(String studentId) throws IllegalArgumentException, ServerException {
 		String uri = host + "/querySchedule";
 		if (studentId == null || studentId.equals("")) {
 			System.out.println("querySchedule: studentId is null or empty");
-			throw new NullParameterException("querySchedule: studentId is null or empty");
+			throw new IllegalArgumentException("querySchedule: studentId is null or empty");
 		} 
 		
 		JSONObject json = new JSONObject();
@@ -212,15 +211,15 @@ public class EasyClientWithOutput {
 		}
 	}
 	
-	public ServerAnswer selectCourse(String courseId, String studentId) throws NullParameterException, ServerException {
+	public ServerAnswer selectCourse(String courseId, String studentId) throws IllegalArgumentException, ServerException {
 		String uri = host + "/selectCourse";
 		if (courseId == null || courseId.equals("")) {
 			System.out.println("selectCourse: courseId is null or empty");
-			throw new NullParameterException("selectCourse: courseId is null or empty");
+			throw new IllegalArgumentException("selectCourse: courseId is null or empty");
 		}
 		if (studentId == null || studentId.equals("")) {
 			System.out.println("selectCourse: studentId is null or empty");
-			throw new NullParameterException("selectCourse: studentId is null or empty");
+			throw new IllegalArgumentException("selectCourse: studentId is null or empty");
 		}
 		
 		JSONObject json = new JSONObject();
@@ -255,15 +254,15 @@ public class EasyClientWithOutput {
 		}
 	}
 	
-	public ServerAnswer dropCourse(String courseId, String studentId) throws NullParameterException, ServerException {
+	public ServerAnswer dropCourse(String courseId, String studentId) throws IllegalArgumentException, ServerException {
 		String uri = host + "/dropCourse";
 		if (courseId == null || courseId.equals("")) {
 			System.out.println("dropCourse: courseId is null or empty");
-			throw new NullParameterException("dropCourse: courseId is null or empty");
+			throw new IllegalArgumentException("dropCourse: courseId is null or empty");
 		}
 		if (studentId == null || studentId.equals("")) {
 			System.out.println("dropCourse: studentId is null or empty");
-			throw new NullParameterException("dropCourse: studentId is null or empty");
+			throw new IllegalArgumentException("dropCourse: studentId is null or empty");
 		}
 		
 		JSONObject json = new JSONObject();
