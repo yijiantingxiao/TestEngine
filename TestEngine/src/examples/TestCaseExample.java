@@ -1,7 +1,6 @@
 package examples;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import testcase.TestCase;
 import beans.ServerAnswer;
@@ -9,14 +8,10 @@ import beans.ServerAnswer;
 public class TestCaseExample extends TestCase {
 	
 	private AtomicInteger success;
-	private AtomicLong minTime;
-	private AtomicLong maxTime;
 
 	protected TestCaseExample(String serverAddress, int threadNum) {
 		super(serverAddress, threadNum);
 		success = new AtomicInteger();
-		minTime = new AtomicLong(Long.MAX_VALUE);
-		maxTime = new AtomicLong();
 	}
 
 	@Override
@@ -29,32 +24,14 @@ public class TestCaseExample extends TestCase {
 			if (answer.isSuccess()) {
 				success.getAndIncrement();
 			}
-			long min, max;
-			boolean flag = false;
-			do {
-				min = minTime.get();
-				if (min > time) {
-					flag = minTime.compareAndSet(min, time);
-				} else {
-					flag = true;
-				}
-			} while (!flag);
-			flag = false;
-			do {
-				max = maxTime.get();
-				if (max < time) {
-					flag = maxTime.compareAndSet(max, time);
-				} else {
-					flag = true;
-				}
-			} while (!flag);
+			updateTime(time);
 		}
 	}
 
 	@Override
 	public void tearDown() {
-		System.out.println("MinTime: " + minTime + "ms");
-		System.out.println("MaxTime: " + maxTime + "ms");
+		System.out.println("MinTime: " + getMinTime() + "ms");
+		System.out.println("MaxTime: " + getMaxTime() + "ms");
 		if (success.get() == getThreadNum() * 1000) {
 			System.out.println("TestCaseExample: Pass");
 		} else {

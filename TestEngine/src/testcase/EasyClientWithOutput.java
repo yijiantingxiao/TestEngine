@@ -13,11 +13,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import beans.ServerAnswer;
 import beans.CourseInfo;
 import beans.SchoolInfo;
+import beans.ServerAnswer;
 import beans.StudentInfo;
 import beans.Time;
+import exception.ServerException;
 import framework.RandomGenerator;
 
 public class EasyClientWithOutput {
@@ -28,7 +29,7 @@ public class EasyClientWithOutput {
 		this.host = "http://" + serverAddress;
 	}
 	
-	public ServerAnswer addSchoolInfo(SchoolInfo schoolInfo){
+	public ServerAnswer addSchoolInfo(SchoolInfo schoolInfo) throws ServerException{
 		String uri = host + "/addSchoolInfo";
 		JSONObject jsonSchoolInfo;
 		if (schoolInfo == null) {
@@ -39,13 +40,13 @@ public class EasyClientWithOutput {
 		System.out.println("addSchoolInfo: " + jsonSchoolInfo + ":");
 		
 		try {
-			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonSchoolInfo.toString()), ServerAnswer.class);
-			boolean success = result.isSuccess();
-			String failReason = result.getFailReason();
-			if (failReason == null) {
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonSchoolInfo.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
 				System.out.println("Server Error");
-				return null;
+				throw new ServerException("addSchoolInfo");
 			}
+			boolean success = answer.isSuccess();
+			String failReason = answer.getFailReason();
 			if (success) {
 				if (failReason.equals("")) {
 					System.out.println("SUCCESS");
@@ -55,14 +56,14 @@ public class EasyClientWithOutput {
 			} else {
 				System.out.println("EXCEPTION");
 			}
-			return result;
+			return answer;
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Server Error");
+			throw new ServerException("addSchoolInfo");
 		}
-		return null;
 	}
 	
-	public ServerAnswer addCourseInfo(CourseInfo courseInfo){
+	public ServerAnswer addCourseInfo(CourseInfo courseInfo) throws ServerException{
 		String uri = host + "/addCourseInfo";
 		JSONObject jsonCourse;
 		if (courseInfo == null) {
@@ -74,13 +75,13 @@ public class EasyClientWithOutput {
 		System.out.println("addCourseInfo: " + jsonCourse + ":");
 		
 		try {
-			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonCourse.toString()), ServerAnswer.class);
-			boolean success = result.isSuccess();
-			String failReason = result.getFailReason();
-			if (failReason == null) {
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonCourse.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
 				System.out.println("Server Error");
-				return null;
+				throw new ServerException("addCourseInfo");
 			}
+			boolean success = answer.isSuccess();
+			String failReason = answer.getFailReason();
 			if (success) {
 				if (failReason.equals("")) {
 					System.out.println("SUCCESS");
@@ -92,14 +93,14 @@ public class EasyClientWithOutput {
 			} else {
 				System.out.println("EXCEPTION");
 			}
-			return result;
+			return answer;
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Server Error");
+			throw new ServerException("addCourseInfo");
 		}
-		return null;
 	}
 	
-	public ServerAnswer addStudentInfo(StudentInfo studentInfo) {
+	public ServerAnswer addStudentInfo(StudentInfo studentInfo) throws ServerException {
 		String uri = host + "/addStudentInfo";
 		JSONObject jsonStudentInfo;
 		if (studentInfo == null) {
@@ -110,13 +111,13 @@ public class EasyClientWithOutput {
 		System.out.println("addStudentInfo: " + jsonStudentInfo + ":");
 		
 		try {
-			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonStudentInfo.toString()), ServerAnswer.class);
-			boolean success = result.isSuccess();
-			String failReason = result.getFailReason();
-			if (failReason == null) {
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonStudentInfo.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
 				System.out.println("Server Error");
-				return null;
+				throw new ServerException("addStudentInfo");
 			}
+			boolean success = answer.isSuccess();
+			String failReason = answer.getFailReason();
 			if (success) {
 				if (failReason.equals("")) {
 					System.out.println("SUCCESS");
@@ -126,18 +127,18 @@ public class EasyClientWithOutput {
 			} else {
 				System.out.println("EXCEPTION");
 			}
-			return result;
+			return answer;
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Server Error");
+			throw new ServerException("addStudentInfo");
 		}
-		return null;
 	}
 	
-	public CourseInfo[] queryCourseByTime(Time time) {
+	public CourseInfo[] queryCourseByTime(Time time) throws IllegalArgumentException, ServerException {
 		String uri = host + "/queryCourseByTime";
 		if (time == null) {
 			System.out.println("queryCourseByTime: time is null");
-			return null;
+			throw new IllegalArgumentException("queryCourseByTime: time is null");
 		}
 		
 		JSONObject jsonTime = new JSONObject();
@@ -147,19 +148,23 @@ public class EasyClientWithOutput {
 		try {
 			JSONObject jsonCourses = sendRequest(uri, jsonTime.toString());
 			CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			if (courses == null) {
+				System.out.println("Server Error");
+				throw new ServerException("queryCourseByTime");
+			}
 			System.out.println("\t" + courses.length);
 			return courses;
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Server Error");
+			throw new ServerException("queryCourseByTime");
 		}
-		return null;
 	}
 	
-	public CourseInfo queryCourseById(String courseId) {
+	public CourseInfo queryCourseById(String courseId) throws IllegalArgumentException, ServerException {
 		String uri = host + "/queryCourseById";
 		if (courseId == null || courseId.equals("")) {
 			System.out.println("queryCourseById: courseId is null or empty");
-			return null;
+			throw new IllegalArgumentException("queryCourseById: courseId is null or empty");
 		} 
 		
 		JSONObject json = new JSONObject();
@@ -168,23 +173,23 @@ public class EasyClientWithOutput {
 
 		try {
 			CourseInfo courseInfo = (CourseInfo) JSONObject.toBean(sendRequest(uri, json.toString()), CourseInfo.class);
-			if (courseInfo.getCourseId() != null) {
+			if (courseInfo != null && courseInfo.getCourseId() != null) {
 				System.out.println("\tExist");
 			} else {
 				System.out.println("\tNot Exist");
 			}
 			return courseInfo;
 		} catch (Exception e) {
-			e.printStackTrace();
-		}		
-		return null;
+			System.out.println("Server Error");
+			throw new ServerException("queryCourseById");
+		}
 	}
 	
-	public CourseInfo[] querySchedule(String studentId) {
+	public CourseInfo[] querySchedule(String studentId) throws IllegalArgumentException, ServerException {
 		String uri = host + "/querySchedule";
 		if (studentId == null || studentId.equals("")) {
 			System.out.println("querySchedule: studentId is null or empty");
-			return null;
+			throw new IllegalArgumentException("querySchedule: studentId is null or empty");
 		} 
 		
 		JSONObject json = new JSONObject();
@@ -193,39 +198,43 @@ public class EasyClientWithOutput {
 
 		try {
 			JSONObject jsonCourses = sendRequest(uri, json.toString());
-			CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
-			System.out.println("\t" + courses.length);
-			return courses;
+			CourseInfo[] schedule = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			if (schedule == null) {
+				System.out.println("Server Error");
+				throw new ServerException("querySchedule");
+			}
+			System.out.println("\t" + schedule.length);
+			return schedule;
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Server Error");
+			throw new ServerException("querySchedule");
 		}
-		return null;
 	}
 	
-	public ServerAnswer selectCourse(String courseId, String studentId) {
+	public ServerAnswer selectCourse(String courseId, String studentId) throws IllegalArgumentException, ServerException {
 		String uri = host + "/selectCourse";
 		if (courseId == null || courseId.equals("")) {
 			System.out.println("selectCourse: courseId is null or empty");
-			return null;
+			throw new IllegalArgumentException("selectCourse: courseId is null or empty");
 		}
 		if (studentId == null || studentId.equals("")) {
 			System.out.println("selectCourse: studentId is null or empty");
-			return null;
+			throw new IllegalArgumentException("selectCourse: studentId is null or empty");
 		}
 		
 		JSONObject json = new JSONObject();
 		json.accumulate("courseId", courseId);
-		json.accumulate("studentId:", studentId);
+		json.accumulate("studentId", studentId);
 		System.out.println("selectCourse: " + json + ":");
 		
 		try {
-			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
-			boolean success = result.isSuccess();
-			String failReason = result.getFailReason();
-			if (failReason == null) {
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
 				System.out.println("Server Error");
-				return null;
+				throw new ServerException("selectCourse");
 			}
+			boolean success = answer.isSuccess();
+			String failReason = answer.getFailReason();
 			if (success) {
 				if (failReason.equals("")) {
 					System.out.println("SUCCESS");
@@ -238,22 +247,22 @@ public class EasyClientWithOutput {
 			} else {
 				System.out.println("EXCEPTION");
 			}
-			return result;
+			return answer;
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Server Error");
+			throw new ServerException("selectCourse");
 		}
-		return null;
 	}
 	
-	public ServerAnswer dropCourse(String courseId, String studentId) {
+	public ServerAnswer dropCourse(String courseId, String studentId) throws IllegalArgumentException, ServerException {
 		String uri = host + "/dropCourse";
 		if (courseId == null || courseId.equals("")) {
 			System.out.println("dropCourse: courseId is null or empty");
-			return null;
+			throw new IllegalArgumentException("dropCourse: courseId is null or empty");
 		}
 		if (studentId == null || studentId.equals("")) {
 			System.out.println("dropCourse: studentId is null or empty");
-			return null;
+			throw new IllegalArgumentException("dropCourse: studentId is null or empty");
 		}
 		
 		JSONObject json = new JSONObject();
@@ -262,13 +271,13 @@ public class EasyClientWithOutput {
 		System.out.println("dropCourse: " + json + ":");
 		
 		try {
-			ServerAnswer result = (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
-			boolean success = result.isSuccess();
-			String failReason = result.getFailReason();
-			if (failReason == null) {
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
 				System.out.println("Server Error");
-				return null;
+				throw new ServerException("dropCourse");
 			}
+			boolean success = answer.isSuccess();
+			String failReason = answer.getFailReason();
 			if (success) {
 				if (failReason.equals("")) {
 					System.out.println("SUCCESS");
@@ -278,25 +287,26 @@ public class EasyClientWithOutput {
 			} else {
 				System.out.println("EXCEPTION");
 			}
-			return result;
+			return answer;
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Server Error");
+			throw new ServerException("dropCourse");
 		}
-		return null;
 	}
 	
-	public void clearData() {
+	public void clearData() throws ServerException {
 		String uri = host + "/clearData";
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost(uri);
 		try {
 			httpClient.execute(httpPost);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Server Error");
+			throw new ServerException("clearData");
 		} 
 	}
 	
-	private JSONObject sendRequest(String uri, String content) throws IOException {
+	private JSONObject sendRequest(String uri, String content) throws IOException, ServerException {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost(uri);
 		CloseableHttpResponse response = null;
@@ -308,8 +318,7 @@ public class EasyClientWithOutput {
 			HttpEntity responseEntity = response.getEntity();
 			return JSONObject.fromObject(EntityUtils.toString(responseEntity, "UTF-8"));
 		} catch (Exception e){
-			e.printStackTrace();
-			return null;
+			throw new ServerException("");
 		} finally {
 			if (response != null) {
 				response.close();
