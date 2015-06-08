@@ -11,11 +11,21 @@ import net.sf.json.JSONObject;
 public class RandomGenerator {
 
 	public static JSONObject randomSchoolInfo() {
-		SchoolInfo schoolInfo = new SchoolInfo(UUID.randomUUID().toString(), 32);
-		return JSONObject.fromObject(schoolInfo);
+		return JSONObject.fromObject(getRandomSchoolInfo());
+	}
+
+	public static SchoolInfo getRandomSchoolInfo() {
+		return new SchoolInfo(UUID.randomUUID().toString(), 32);
 	}
 	
 	public static JSONObject randomCourseInfo() {
+		CourseInfo courseInfo = getRandomCourseInfo();
+		JSONObject course = new JSONObject();
+		course.accumulate("course", courseInfo);
+		return course;
+	}
+
+	public static CourseInfo getRandomCourseInfo() {
 		CourseInfo courseInfo = new CourseInfo();
 		courseInfo.setCourseId(UUID.randomUUID().toString());
 		courseInfo.setSchoolName(UUID.randomUUID().toString());
@@ -25,21 +35,20 @@ public class RandomGenerator {
 		courseInfo.setLocation(UUID.randomUUID().toString());
 		courseInfo.setTime(new Time(1, 1));
 		courseInfo.setCapacity(50);
-		JSONObject course = new JSONObject();
-		course.accumulate("course", courseInfo);
-		return course;
+		return courseInfo;
 	}
 	
 	public static JSONObject randomStudentInfo() {
+		return JSONObject.fromObject(getRandomStudentInfo());
+	}
+
+	public static StudentInfo getRandomStudentInfo() {
 		StudentInfo studentInfo = new StudentInfo();
 		studentInfo.setStudentId(UUID.randomUUID().toString());
 		studentInfo.setName(UUID.randomUUID().toString());
 		studentInfo.setGender("男");
 		studentInfo.setSchoolName(UUID.randomUUID().toString());
-		return JSONObject.fromObject(studentInfo);
+		return studentInfo;
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(randomStudentInfo());
-	}
 }
