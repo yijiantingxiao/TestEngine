@@ -32,7 +32,7 @@ public abstract class TestCase {
 		}
 	}
 	
-	public abstract void run();
+	protected abstract void run();
 	
 	public void tearDown() {
 		System.out.println("MinTime: " + minTime + "ms");
@@ -61,7 +61,7 @@ public abstract class TestCase {
 		} while (!flag);
 	}
 
-	public EasyClient getClient() {
+	protected EasyClient getClient() {
 		return client;
 	}
 	
@@ -69,7 +69,7 @@ public abstract class TestCase {
 		return threadNum;
 	}
 
-	public int getLoopTime() {
+	protected int getLoopTime() {
 		return loopTime;
 	}
 

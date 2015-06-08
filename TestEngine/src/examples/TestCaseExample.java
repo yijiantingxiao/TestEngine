@@ -9,13 +9,13 @@ public class TestCaseExample extends TestCase {
 	
 	private AtomicInteger success;
 
-	protected TestCaseExample(String serverAddress, int threadNum, int loopTime) {
+	public TestCaseExample(String serverAddress, int threadNum, int loopTime) {
 		super(serverAddress, threadNum, loopTime);
 		success = new AtomicInteger();
 	}
 
 	@Override
-	public void run() {
+	protected void run() {
 		ServerAnswer answer = getClient().addSchoolInfo(null);
 		if (answer.isSuccess()) {
 			success.getAndIncrement();
