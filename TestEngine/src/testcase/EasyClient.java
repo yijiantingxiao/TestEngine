@@ -18,6 +18,8 @@ import beans.SchoolInfo;
 import beans.ServerAnswer;
 import beans.StudentInfo;
 import beans.Time;
+import exception.NullParameterException;
+import exception.ServerException;
 import framework.RandomGenerator;
 
 public class EasyClient {
@@ -28,7 +30,7 @@ private String host;
 		this.host = "http://" + serverAddress;
 	}
 	
-	public ServerAnswer addSchoolInfo(SchoolInfo schoolInfo){
+	public ServerAnswer addSchoolInfo(SchoolInfo schoolInfo) throws ServerException{
 		String uri = host + "/addSchoolInfo";
 		JSONObject jsonSchoolInfo;
 		if (schoolInfo == null) {
@@ -38,14 +40,17 @@ private String host;
 		}
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonSchoolInfo.toString()), ServerAnswer.class);
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonSchoolInfo.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
+				throw new ServerException("addSchoolInfo");
+			}
+			return answer;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ServerException("addSchoolInfo");
 		}
-		return null;
 	}
 	
-	public ServerAnswer addCourseInfo(CourseInfo courseInfo){
+	public ServerAnswer addCourseInfo(CourseInfo courseInfo) throws ServerException{
 		String uri = host + "/addCourseInfo";
 		JSONObject jsonCourse;
 		if (courseInfo == null) {
@@ -56,14 +61,17 @@ private String host;
 		}
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonCourse.toString()), ServerAnswer.class);
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonCourse.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
+				throw new ServerException("addCourseInfo");
+			}
+			return answer;
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new ServerException("addCourseInfo");
 		}
-		return null;
 	}
 	
-	public ServerAnswer addStudentInfo(StudentInfo studentInfo) {
+	public ServerAnswer addStudentInfo(StudentInfo studentInfo) throws ServerException {
 		String uri = host + "/addStudentInfo";
 		JSONObject jsonStudentInfo;
 		if (studentInfo == null) {
@@ -73,18 +81,20 @@ private String host;
 		}
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonStudentInfo.toString()), ServerAnswer.class);
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonStudentInfo.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
+				throw new ServerException("addStudentInfo");
+			}
+			return answer;
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new ServerException("addStudentInfo");
 		}
-		return null;
 	}
 	
-	public CourseInfo[] queryCourseByTime(Time time) {
+	public CourseInfo[] queryCourseByTime(Time time) throws NullParameterException, ServerException {
 		String uri = host + "/queryCourseByTime";
 		if (time == null) {
-			System.out.println("queryCourseByTime: time is null");
-			return null;
+			throw new NullParameterException("queryCourseByTime: time is null");
 		}
 		
 		JSONObject jsonTime = new JSONObject();
@@ -92,18 +102,20 @@ private String host;
 		
 		try {
 			JSONObject jsonCourses = sendRequest(uri, jsonTime.toString());
-			return (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			if (courses == null) {
+				throw new ServerException("queryCourseByTime");
+			}
+			return courses;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ServerException("queryCourseByTime");
 		}
-		return null;
 	}
 	
-	public CourseInfo queryCourseById(String courseId) {
+	public CourseInfo queryCourseById(String courseId) throws NullParameterException, ServerException {
 		String uri = host + "/queryCourseById";
 		if (courseId == null || courseId.equals("")) {
-			System.out.println("queryCourseById: courseId is null or empty");
-			return null;
+			throw new NullParameterException("queryCourseById: courseId is null or empty");
 		} 
 		
 		JSONObject json = new JSONObject();
@@ -112,16 +124,14 @@ private String host;
 		try {
 			return (CourseInfo) JSONObject.toBean(sendRequest(uri, json.toString()), CourseInfo.class);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}		
-		return null;
+			throw new ServerException("queryCourseById");
+		}
 	}
 	
-	public CourseInfo[] querySchedule(String studentId) {
+	public CourseInfo[] querySchedule(String studentId) throws NullParameterException, ServerException {
 		String uri = host + "/querySchedule";
 		if (studentId == null || studentId.equals("")) {
-			System.out.println("querySchedule: studentId is null or empty");
-			return null;
+			throw new NullParameterException("querySchedule: studentId is null or empty");
 		} 
 		
 		JSONObject json = new JSONObject();
@@ -129,45 +139,23 @@ private String host;
 
 		try {
 			JSONObject jsonCourses = sendRequest(uri, json.toString());
-			return (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			CourseInfo[] schedule = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			if (schedule == null) {
+				throw new ServerException("querySchedule");
+			}
+			return schedule;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ServerException("querySchedule");
 		}
-		return null;
 	}
 	
-	public ServerAnswer selectCourse(String courseId, String studentId) {
+	public ServerAnswer selectCourse(String courseId, String studentId) throws NullParameterException, ServerException {
 		String uri = host + "/selectCourse";
 		if (courseId == null || courseId.equals("")) {
-			System.out.println("selectCourse: courseId is null or empty");
-			return null;
+			throw new NullParameterException("selectCourse: courseId is null or empty");
 		}
 		if (studentId == null || studentId.equals("")) {
-			System.out.println("selectCourse: studentId is null or empty");
-			return null;
-		}
-		
-		JSONObject json = new JSONObject();
-		json.accumulate("courseId", courseId);
-		json.accumulate("studentId:", studentId);
-		
-		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public ServerAnswer dropCourse(String courseId, String studentId) {
-		String uri = host + "/dropCourse";
-		if (courseId == null || courseId.equals("")) {
-			System.out.println("dropCourse: courseId is null or empty");
-			return null;
-		}
-		if (studentId == null || studentId.equals("")) {
-			System.out.println("dropCourse: studentId is null or empty");
-			return null;
+			throw new NullParameterException("selectCourse: studentId is null or empty");
 		}
 		
 		JSONObject json = new JSONObject();
@@ -175,25 +163,52 @@ private String host;
 		json.accumulate("studentId", studentId);
 		
 		try {
-			return (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
+				throw new ServerException("selectCourse");
+			}
+			return answer;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ServerException("selectCourse");
 		}
-		return null;
 	}
 	
-	public void clearData() {
+	public ServerAnswer dropCourse(String courseId, String studentId) throws NullParameterException, ServerException {
+		String uri = host + "/dropCourse";
+		if (courseId == null || courseId.equals("")) {
+			throw new NullParameterException("dropCourse: courseId is null or empty");
+		}
+		if (studentId == null || studentId.equals("")) {
+			throw new NullParameterException("dropCourse: studentId is null or empty");
+		}
+		
+		JSONObject json = new JSONObject();
+		json.accumulate("courseId", courseId);
+		json.accumulate("studentId", studentId);
+		
+		try {
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, json.toString()), ServerAnswer.class);
+			if (answer == null || answer.getFailReason() == null) {
+				throw new ServerException("dropCourse");
+			}
+			return answer;
+		} catch (Exception e) {
+			throw new ServerException("dropCourse");
+		}
+	}
+	
+	public void clearData() throws ServerException {
 		String uri = host + "/clearData";
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost(uri);
 		try {
 			httpClient.execute(httpPost);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ServerException("clearData");
 		} 
 	}
 	
-	private JSONObject sendRequest(String uri, String content) throws IOException {
+	private JSONObject sendRequest(String uri, String content) throws IOException, ServerException {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost(uri);
 		CloseableHttpResponse response = null;
@@ -205,8 +220,7 @@ private String host;
 			HttpEntity responseEntity = response.getEntity();
 			return JSONObject.fromObject(EntityUtils.toString(responseEntity, "UTF-8"));
 		} catch (Exception e){
-			e.printStackTrace();
-			return null;
+			throw new ServerException("");
 		} finally {
 			if (response != null) {
 				response.close();
