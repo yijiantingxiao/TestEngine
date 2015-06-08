@@ -32,7 +32,7 @@ public class TestFramework {
 			Runnable run = new Runnable() {				
 				@Override
 				public void run() {
-					test.run();
+					test.loopRun();
 				}
 			};
 			for (int i = 0; i < threadNum; i++) {

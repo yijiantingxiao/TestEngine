@@ -9,30 +9,23 @@ public class TestCaseExample extends TestCase {
 	
 	private AtomicInteger success;
 
-	protected TestCaseExample(String serverAddress, int threadNum) {
-		super(serverAddress, threadNum);
+	protected TestCaseExample(String serverAddress, int threadNum, int loopTime) {
+		super(serverAddress, threadNum, loopTime);
 		success = new AtomicInteger();
 	}
 
 	@Override
 	public void run() {
-		for (int i = 0; i < 1000; i++) {
-			long start = System.currentTimeMillis();
-			ServerAnswer answer = getClient().addSchoolInfo(null);
-			long end = System.currentTimeMillis();
-			long time = end - start;
-			if (answer.isSuccess()) {
-				success.getAndIncrement();
-			}
-			updateTime(time);
+		ServerAnswer answer = getClient().addSchoolInfo(null);
+		if (answer.isSuccess()) {
+			success.getAndIncrement();
 		}
 	}
 
 	@Override
 	public void tearDown() {
-		System.out.println("MinTime: " + getMinTime() + "ms");
-		System.out.println("MaxTime: " + getMaxTime() + "ms");
-		if (success.get() == getThreadNum() * 1000) {
+		super.tearDown();
+		if (success.get() == getThreadNum() * getLoopTime()) {
 			System.out.println("TestCaseExample: Pass");
 		} else {
 			System.out.println("TestCaseExample: Failed");

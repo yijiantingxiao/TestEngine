@@ -6,12 +6,14 @@ public abstract class TestCase {
 	
 	private EasyClient client;
 	private int threadNum;
+	private int loopTime;
 	private AtomicLong minTime;
 	private AtomicLong maxTime;
 	
-	protected TestCase(String serverAddress, int threadNum){
+	protected TestCase(String serverAddress, int threadNum, int loopTime){
 		client = new EasyClient(serverAddress);
 		this.threadNum = threadNum;
+		this.loopTime = loopTime;
 		minTime = new AtomicLong(Long.MAX_VALUE);
 		maxTime = new AtomicLong();
 	}
@@ -20,12 +22,24 @@ public abstract class TestCase {
 		return true;
 	}
 	
+	public void loopRun() {
+		for (int i = 0; i < loopTime; i++) {
+			long start = System.currentTimeMillis();
+			run();
+			long end = System.currentTimeMillis();
+			long time = end - start;
+			updateTime(time);
+		}
+	}
+	
 	public abstract void run();
 	
 	public void tearDown() {
+		System.out.println("MinTime: " + minTime + "ms");
+		System.out.println("MaxTime: " + maxTime + "ms");
 	}
 	
-	protected void updateTime(long time) {
+	private void updateTime(long time) {
 		long min, max;
 		boolean flag = false;
 		do {
@@ -55,12 +69,8 @@ public abstract class TestCase {
 		return threadNum;
 	}
 
-	public AtomicLong getMinTime() {
-		return minTime;
-	}
-
-	public AtomicLong getMaxTime() {
-		return maxTime;
+	public int getLoopTime() {
+		return loopTime;
 	}
 
 }
