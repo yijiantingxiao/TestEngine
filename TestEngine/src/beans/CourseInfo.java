@@ -91,5 +91,71 @@ public class CourseInfo {
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + capacity;
+		result = prime * result
+				+ ((courseId == null) ? 0 : courseId.hashCode());
+		result = prime * result
+				+ ((courseName == null) ? 0 : courseName.hashCode());
+		result = prime * result + credit;
+		result = prime * result
+				+ ((location == null) ? 0 : location.hashCode());
+		result = prime * result
+				+ ((schoolName == null) ? 0 : schoolName.hashCode());
+		result = prime * result
+				+ ((teacherName == null) ? 0 : teacherName.hashCode());
+		result = prime * result + ((time == null) ? 0 : time.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CourseInfo other = (CourseInfo) obj;
+		if (capacity != other.capacity)
+			return false;
+		if (courseId == null) {
+			if (other.courseId != null)
+				return false;
+		} else if (!courseId.equals(other.courseId))
+			return false;
+		if (courseName == null) {
+			if (other.courseName != null)
+				return false;
+		} else if (!courseName.equals(other.courseName))
+			return false;
+		if (credit != other.credit)
+			return false;
+		if (location == null) {
+			if (other.location != null)
+				return false;
+		} else if (!location.equals(other.location))
+			return false;
+		if (schoolName == null) {
+			if (other.schoolName != null)
+				return false;
+		} else if (!schoolName.equals(other.schoolName))
+			return false;
+		if (teacherName == null) {
+			if (other.teacherName != null)
+				return false;
+		} else if (!teacherName.equals(other.teacherName))
+			return false;
+		if (time == null) {
+			if (other.time != null)
+				return false;
+		} else if (!time.equals(other.time))
+			return false;
+		return true;
+	}
 	
 }
