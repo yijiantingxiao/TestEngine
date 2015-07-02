@@ -53,7 +53,7 @@ private String host;
 		String uri = host + "/addCourseInfo";
 		JSONObject jsonCourse;
 		if (courseInfo == null) {
-			jsonCourse = RandomGenerator.randomCourseInfo();
+			jsonCourse = RandomGenerator.randomCourseInfo(null);
 		} else {
 			jsonCourse = new JSONObject();
 			jsonCourse.accumulate("course", courseInfo);
@@ -74,7 +74,7 @@ private String host;
 		String uri = host + "/addStudentInfo";
 		JSONObject jsonStudentInfo;
 		if (studentInfo == null) {
-			jsonStudentInfo = RandomGenerator.randomStudentInfo();
+			jsonStudentInfo = RandomGenerator.randomStudentInfo(null);
 		} else {
 			jsonStudentInfo = JSONObject.fromObject(studentInfo);
 		}

@@ -2,6 +2,8 @@ package testcase;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import beans.ServerAnswer;
+
 public abstract class TestCase {
 	
 	private EasyClient client;
@@ -71,6 +73,13 @@ public abstract class TestCase {
 
 	protected int getLoopTime() {
 		return loopTime;
+	}
+	
+	protected boolean checkAnswer(ServerAnswer answer) {
+		if (answer.isSuccess() && answer.getFailReason() != null && answer.getFailReason().equals("")) {
+			return true;
+		}
+		return false;
 	}
 
 }
