@@ -31,6 +31,7 @@ public class FunctionalTest {
 			System.err.println("Sleep Failed");
 		}
 		
+		System.out.println("==============");
 		testName = "addSchoolInfo";
 		answer = client.addSchoolInfo(SCHOOL_ONE);
 		if (checkNormalCaseAnswer()) {
@@ -41,6 +42,7 @@ public class FunctionalTest {
 			return;
 		}
 		
+		System.out.println("==============");
 		testName = "addCourseInfo";
 		answer = client.addCourseInfo(COURSE_ONE);
 		if (checkNormalCaseAnswer()) {
@@ -81,6 +83,7 @@ public class FunctionalTest {
 			return;
 		}
 		
+		System.out.println("==============");
 		testName = "addStudentInfo";
 		answer = client.addStudentInfo(STUDENT_ONE);
 		if (checkNormalCaseAnswer()) {
@@ -101,9 +104,10 @@ public class FunctionalTest {
 			return;
 		}
 		
+		System.out.println("==============");
 		testName = "queryCourseByTime";
 		CourseInfo[] courses = client.queryCourseByTime(COURSE_ONE.getTime());
-		if (courses != null && courses.length == 1 && courses[0].equals(COURSE_ONE)) {
+		if (courses != null && courses.length == 1 && COURSE_ONE.equals(courses[0])) {
 			printNormalPass();
 		} else {
 			printNormalFail();
@@ -116,9 +120,10 @@ public class FunctionalTest {
 			printNormalFail();
 		}
 		
+		System.out.println("==============");
 		testName = "queryCourseById";
 		CourseInfo course = client.queryCourseById(COURSE_ONE.getCourseId());
-		if (course != null && course.equals(COURSE_ONE)) {
+		if (course != null && COURSE_ONE.equals(course)) {
 			printNormalPass();
 		} else {
 			printNormalFail();
@@ -131,6 +136,7 @@ public class FunctionalTest {
 			printNormalFail();
 		}
 		
+		System.out.println("==============");
 		testName = "querySchedule before selectCourse";
 		courses = client.querySchedule(STUDENT_ONE.getStudentId());
 		if (courses != null && courses.length == 0) {
@@ -139,6 +145,7 @@ public class FunctionalTest {
 			printNormalFail();
 		}
 		
+		System.out.println("==============");
 		testName = "selectCourse";
 		answer = client.selectCourse(COURSE_ONE.getCourseId(), STUDENT_ONE.getStudentId());
 		if (checkNormalCaseAnswer()) {
@@ -171,14 +178,16 @@ public class FunctionalTest {
 			return;
 		}
 		
+		System.out.println("==============");
 		testName = "querySchedule after selectCourse";
 		courses = client.querySchedule(STUDENT_ONE.getStudentId());
-		if (course != null && courses.length == 1 && courses[0].equals(COURSE_ONE)) {
+		if (course != null && courses.length == 1 && COURSE_ONE.equals(courses[0])) {
 			printNormalPass();
 		} else {
 			printNormalFail();
 		}
 		
+		System.out.println("==============");
 		testName = "dropCourse";
 		answer = client.dropCourse(COURSE_ONE.getCourseId(), STUDENT_ONE.getStudentId());
 		if (checkNormalCaseAnswer()) {
@@ -197,6 +206,7 @@ public class FunctionalTest {
 			return;
 		}
 		
+		System.out.println("==============");
 		testName = "querySchedule after dropCourse";
 		courses = client.querySchedule(STUDENT_ONE.getStudentId());
 		if (courses != null && courses.length == 0) {
@@ -207,6 +217,7 @@ public class FunctionalTest {
 		
 		client.clearData();
 		
+		System.out.println("==============");
 		System.out.println("The End of FunctionalTest");
 	}
 	

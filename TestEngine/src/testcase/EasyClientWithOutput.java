@@ -172,7 +172,8 @@ public class EasyClientWithOutput {
 		System.out.println("queryCourseById: " + json + ":");
 
 		try {
-			CourseInfo courseInfo = (CourseInfo) JSONObject.toBean(sendRequest(uri, json.toString()), CourseInfo.class);
+			JSONObject jsonCourse = sendRequest(uri, json.toString());
+			CourseInfo courseInfo = (CourseInfo) JSONObject.toBean(jsonCourse.getJSONObject("course"), CourseInfo.class);
 			if (courseInfo != null && courseInfo.getCourseId() != null) {
 				System.out.println("\tExist");
 			} else {

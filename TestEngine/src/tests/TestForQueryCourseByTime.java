@@ -19,7 +19,7 @@ public class TestForQueryCourseByTime extends TestCase {
 	private AtomicInteger success;
 
 	protected TestForQueryCourseByTime(int threadNum) {
-		super(TestVariables.SERVERADDRESS, threadNum, 200);
+		super(TestVariables.SERVERADDRESS, threadNum, 128);
 		timeCountMap = new HashMap<Time, List<CourseInfo>>();
 		success = new AtomicInteger();
 	}

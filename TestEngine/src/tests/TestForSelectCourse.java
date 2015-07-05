@@ -2,31 +2,29 @@ package tests;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import framework.RandomGenerator;
+import testcase.TestCase;
 import beans.CourseInfo;
 import beans.SchoolInfo;
 import beans.ServerAnswer;
 import beans.StudentInfo;
 import beans.Time;
-import testcase.TestCase;
+import framework.RandomGenerator;
 
 public class TestForSelectCourse extends TestCase {
-		
-	Random random;
+	
 	private AtomicInteger[] standards;
 	private AtomicInteger[] results;
 	private String[] cases;
+	private AtomicInteger number;
 	private SchoolInfo schoolInfo;
 	private CourseInfo courseInfo;
 	private CourseInfo courseInfo2;
 	private CourseInfo courseInfo3;
 
 	protected TestForSelectCourse(int threadNum) {
-		super(TestVariables.SERVERADDRESS, threadNum, 200);
-		random = new Random();
+		super(TestVariables.SERVERADDRESS, threadNum, 128);
 		standards = new AtomicInteger[6];
 		results = new AtomicInteger[6];
 		for (int i = 0; i < 6; i++) {
@@ -34,6 +32,7 @@ public class TestForSelectCourse extends TestCase {
 			results[i] = new AtomicInteger();
 		}
 		cases = new String[] {"success", "student not exist", "course not exist", "credit exceed", "conflict", "maximum number"};
+		number = new AtomicInteger();
 	}
 
 	@Override
@@ -80,7 +79,7 @@ public class TestForSelectCourse extends TestCase {
 
 	@Override
 	protected void run() {
-		int caseNumber = random.nextInt(5);
+		int caseNumber = number.getAndIncrement() / 5;
 		switch (caseNumber) {
 		case 0:
 			logicForCase1();
@@ -210,7 +209,7 @@ public class TestForSelectCourse extends TestCase {
 			System.out.println("TestForSelectCourse: Passed");
 		} else {
 			System.err.println("TestForSelectCourse: Failed");
-			System.out.println("Failure Cases:");
+			System.out.println("Failure Cases: " + failure.size() + "/" + cases.length);
 			for (Integer fail : failure) {
 				System.out.println("\t" + cases[fail]);
 			}

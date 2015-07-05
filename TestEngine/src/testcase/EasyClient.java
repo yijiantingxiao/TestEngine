@@ -121,7 +121,8 @@ private String host;
 		json.accumulate("courseId", courseId);
 
 		try {
-			return (CourseInfo) JSONObject.toBean(sendRequest(uri, json.toString()), CourseInfo.class);
+			JSONObject jsonCourse = sendRequest(uri, json.toString());
+			return (CourseInfo) JSONObject.toBean(jsonCourse.getJSONObject("course"), CourseInfo.class);
 		} catch (Exception e) {
 			throw new ServerException("queryCourseById");
 		}
