@@ -101,12 +101,15 @@ private String host;
 		
 		try {
 			JSONObject jsonCourses = sendRequest(uri, jsonTime.toString());
+			System.out.println(jsonCourses);
 			CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			//CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray((JSONArray)jsonCourses.get("courses"), CourseInfo.class);
 			if (courses == null) {
 				throw new ServerException("queryCourseByTime");
 			}
 			return courses;
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ServerException("queryCourseByTime");
 		}
 	}
@@ -122,6 +125,10 @@ private String host;
 
 		try {
 			JSONObject jsonCourse = sendRequest(uri, json.toString());
+			/*if (jsonCourse.getJSONObject("course") == null) {
+				return (CourseInfo) JSONObject.toBean(jsonCourse, CourseInfo.class);
+			}*/
+			//return (CourseInfo) JSONObject.toBean(jsonCourse, CourseInfo.class);
 			return (CourseInfo) JSONObject.toBean(jsonCourse.getJSONObject("course"), CourseInfo.class);
 		} catch (Exception e) {
 			throw new ServerException("queryCourseById");
@@ -140,6 +147,7 @@ private String host;
 		try {
 			JSONObject jsonCourses = sendRequest(uri, json.toString());
 			CourseInfo[] schedule = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
+			//CourseInfo[] schedule = (CourseInfo[]) JSONObject.toBean(jsonCourses.getJSONObject("courses"), CourseInfo[].class);
 			if (schedule == null) {
 				throw new ServerException("querySchedule");
 			}
@@ -204,7 +212,7 @@ private String host;
 		try {
 			httpClient.execute(httpPost);
 		} catch (Exception e) {
-			throw new ServerException("clearData");
+			throw new ServerException("clearData: " + e.getMessage());
 		} 
 	}
 	

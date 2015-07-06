@@ -26,7 +26,7 @@ public class FunctionalTest {
 		EasyClient client = new EasyClient(TestVariables.SERVERADDRESS);
 		client.clearData();
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			System.err.println("Sleep Failed");
 		}
@@ -106,8 +106,8 @@ public class FunctionalTest {
 		
 		System.out.println("==============");
 		testName = "queryCourseByTime";
-		CourseInfo[] courses = client.queryCourseByTime(COURSE_ONE.getTime());
-		if (courses != null && courses.length == 1 && COURSE_ONE.equals(courses[0])) {
+		CourseInfo[] courses = client.queryCourseByTime(COURSE_TWO.getTime());
+		if (courses != null && courses.length == 1 && COURSE_TWO.equals(courses[0])) {
 			printNormalPass();
 		} else {
 			printNormalFail();
@@ -181,7 +181,7 @@ public class FunctionalTest {
 		System.out.println("==============");
 		testName = "querySchedule after selectCourse";
 		courses = client.querySchedule(STUDENT_ONE.getStudentId());
-		if (course != null && courses.length == 1 && COURSE_ONE.equals(courses[0])) {
+		if (courses != null && courses.length == 1 && COURSE_ONE.equals(courses[0])) {
 			printNormalPass();
 		} else {
 			printNormalFail();
@@ -226,6 +226,7 @@ public class FunctionalTest {
 			printNormalPass();
 			return true;
 		}
+		System.out.println(answer);
 		printNormalFail();
 		return false;
 	}
@@ -235,6 +236,7 @@ public class FunctionalTest {
 				&& (answer.getFailReason().equals(errorInfo) || answer.getFailReason().equals(errorInfoAlter))) {
 			printErrorPass();
 		} else {
+			System.out.println(answer);
 			printErrorFail();
 		}
 	}
@@ -244,7 +246,7 @@ public class FunctionalTest {
 	}
 
 	private static void printNormalFail() {
-		System.err.println(testName + " Naomal case \tfailed");
+		System.err.println(testName + " Normal case \tfailed");
 	}
 	
 	private static void printErrorPass(){

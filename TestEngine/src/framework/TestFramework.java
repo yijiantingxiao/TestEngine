@@ -22,10 +22,12 @@ public class TestFramework {
 		return true;
 	}
 	
-	public void start() {		
+	public void start() {
+		System.out.println("setUp @ TestFramework");
 		if (!setUp()) {
 			return;
 		}
+		System.out.println("start @ TestFramework");
 		List<Thread> threads = new LinkedList<Thread>();
 		for (final TestCase test : tests) {
 			int threadNum = test.getThreadNum();
@@ -52,6 +54,7 @@ public class TestFramework {
 	}
 	
 	private void tearDown() {
+		System.out.println("tearDown @ TestFramework");
 		for (TestCase test : tests) {
 			test.tearDown();
 		}

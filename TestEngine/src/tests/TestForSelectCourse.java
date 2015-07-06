@@ -3,6 +3,7 @@ package tests;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import testcase.TestCase;
 import beans.CourseInfo;
@@ -14,8 +15,8 @@ import framework.RandomGenerator;
 
 public class TestForSelectCourse extends TestCase {
 	
-	private AtomicInteger[] standards;
-	private AtomicInteger[] results;
+	private AtomicIntegerArray standards;
+	private AtomicIntegerArray results;
 	private String[] cases;
 	private AtomicInteger number;
 	private SchoolInfo schoolInfo;
@@ -24,13 +25,9 @@ public class TestForSelectCourse extends TestCase {
 	private CourseInfo courseInfo3;
 
 	protected TestForSelectCourse(int threadNum) {
-		super(TestVariables.SERVERADDRESS, threadNum, 128);
-		standards = new AtomicInteger[6];
-		results = new AtomicInteger[6];
-		for (int i = 0; i < 6; i++) {
-			standards[i] = new AtomicInteger();
-			results[i] = new AtomicInteger();
-		}
+		super(TestVariables.SERVERADDRESS, threadNum, 64);
+		standards = new AtomicIntegerArray(6);
+		results = new AtomicIntegerArray(6);
 		cases = new String[] {"success", "student not exist", "course not exist", "credit exceed", "conflict", "maximum number"};
 		number = new AtomicInteger();
 	}
@@ -111,11 +108,11 @@ public class TestForSelectCourse extends TestCase {
 		int success;
 		boolean flag;
 		do {
-			success = standards[0].get();
+			success = standards.get(0);
 			if (success < courseInfo.getCapacity()) {
-				flag = standards[0].compareAndSet(success, success + 1);
+				flag = standards.compareAndSet(0, success, success + 1);
 			} else {
-				standards[5].getAndIncrement();
+				standards.getAndIncrement(5);
 				flag = true;
 			}
 		} while (!flag);
@@ -124,7 +121,7 @@ public class TestForSelectCourse extends TestCase {
 	}
 
 	private void logicForCase2() {
-		standards[1].getAndIncrement();
+		standards.getAndIncrement(1);
 		ServerAnswer answer = getClient().selectCourse(courseInfo.getCourseId(), "= =");
 		checkSelectAnswer(answer);
 	}
@@ -136,7 +133,7 @@ public class TestForSelectCourse extends TestCase {
 			System.err.println("logicForCase3 @ TestForSelectCourse: addStudentInfo failed");
 			return;
 		}
-		standards[2].getAndIncrement();
+		standards.getAndIncrement(2);
 		answer = getClient().selectCourse("= =", studentInfo.getStudentId());
 		checkSelectAnswer(answer);
 	}
@@ -148,7 +145,7 @@ public class TestForSelectCourse extends TestCase {
 			System.err.println("logicForCase4 @ TestForSelectCourse: addStudentInfo failed");
 			return;
 		}
-		standards[3].getAndIncrement();
+		standards.getAndIncrement(3);
 		answer = getClient().selectCourse(courseInfo2.getCourseId(), studentInfo.getStudentId());
 		if (!checkAnswer(answer)) {
 			System.err.println("logicForCase4 @ TestForSelectCourse: selectCourse2 failed");
@@ -165,7 +162,7 @@ public class TestForSelectCourse extends TestCase {
 			System.err.println("logicForCase5 @ TestForSelectCourse: addStudentInfo failed");
 			return;
 		}
-		standards[4].getAndIncrement();
+		standards.getAndIncrement(4);
 		answer = getClient().selectCourse(courseInfo3.getCourseId(), studentInfo.getStudentId());
 		if (!checkAnswer(answer)) {
 			System.err.println("logicForCase5 @ TestForSelectCourse: selectCourse3 failed");
@@ -178,19 +175,19 @@ public class TestForSelectCourse extends TestCase {
 	
 	private void checkSelectAnswer(ServerAnswer answer) {
 		if (checkAnswer(answer)) {
-			results[0].getAndIncrement();
+			results.getAndIncrement(0);
 		} else if (!answer.isSuccess()) {
 			String failReason = answer.getFailReason();
 			if (failReason.equals("学生不存在")) {
-				results[1].getAndIncrement();
+				results.getAndIncrement(1);
 			} else if (failReason.equals("课程不存在")) {
-				results[2].getAndIncrement();
+				results.getAndIncrement(2);
 			} else if (failReason.equals("学分已满")) {
-				results[3].getAndIncrement();
+				results.getAndIncrement(3);
 			} else if (failReason.equals("选课时间地点冲突") || failReason.equals("选课时间冲突")) {
-				results[4].getAndIncrement();
+				results.getAndIncrement(4);
 			} else if (failReason.equals("选课人数已满")) {
-				results[5].getAndIncrement();
+				results.getAndIncrement(5);
 			}
 		}
 		
@@ -201,12 +198,15 @@ public class TestForSelectCourse extends TestCase {
 		super.tearDown();
 		List<Integer> failure = new LinkedList<Integer>();
 		for (int i = 0; i < 6; i++) {
-			if (results[i].get() != standards[i].get()) {
+			if (results.get(i) != standards.get(i)) {
 				failure.add(i);
 			}
 		}
 		if (failure.isEmpty()) {
 			System.out.println("TestForSelectCourse: Passed");
+			for (int i = 0; i < 6; i++) {
+				System.out.println(standards.get(i));
+			}
 		} else {
 			System.err.println("TestForSelectCourse: Failed");
 			System.out.println("Failure Cases: " + failure.size() + "/" + cases.length);

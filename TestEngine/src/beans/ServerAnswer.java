@@ -20,5 +20,11 @@ public class ServerAnswer {
 	public void setFailReason(String failReason) {
 		this.failReason = failReason;
 	}
+
+	@Override
+	public String toString() {
+		return "ServerAnswer [success=" + success + ", failReason="
+				+ failReason + "]";
+	}
 	
 }
