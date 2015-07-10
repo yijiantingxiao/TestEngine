@@ -184,7 +184,7 @@ public class TestForSelectCourse extends TestCase {
 				results.getAndIncrement(2);
 			} else if (failReason.equals("学分已满")) {
 				results.getAndIncrement(3);
-			} else if (failReason.equals("选课时间地点冲突") || failReason.equals("选课时间冲突")) {
+			} else if (failReason.equals("选课时间地点冲突") || failReason.equals("选课时间冲突") || failReason.equals("学生此时间段已选课")) {
 				results.getAndIncrement(4);
 			} else if (failReason.equals("选课人数已满")) {
 				results.getAndIncrement(5);

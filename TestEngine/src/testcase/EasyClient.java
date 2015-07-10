@@ -60,7 +60,9 @@ private String host;
 		}
 		
 		try {
-			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(sendRequest(uri, jsonCourse.toString()), ServerAnswer.class);
+			JSONObject json = sendRequest(uri, jsonCourse.toString());
+			System.out.println(json);
+			ServerAnswer answer = (ServerAnswer) JSONObject.toBean(json, ServerAnswer.class);
 			if (answer == null || answer.getFailReason() == null) {
 				throw new ServerException("addCourseInfo");
 			}
@@ -101,7 +103,7 @@ private String host;
 		
 		try {
 			JSONObject jsonCourses = sendRequest(uri, jsonTime.toString());
-			System.out.println(jsonCourses);
+			//System.out.println(jsonCourses);
 			CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
 			//CourseInfo[] courses = (CourseInfo[]) JSONArray.toArray((JSONArray)jsonCourses.get("courses"), CourseInfo.class);
 			if (courses == null) {
@@ -128,9 +130,11 @@ private String host;
 			/*if (jsonCourse.getJSONObject("course") == null) {
 				return (CourseInfo) JSONObject.toBean(jsonCourse, CourseInfo.class);
 			}*/
-			//return (CourseInfo) JSONObject.toBean(jsonCourse, CourseInfo.class);
-			return (CourseInfo) JSONObject.toBean(jsonCourse.getJSONObject("course"), CourseInfo.class);
+			return (CourseInfo) JSONObject.toBean(jsonCourse, CourseInfo.class);
+			//System.out.println(jsonCourse);
+			//return (CourseInfo) JSONObject.toBean(jsonCourse.getJSONObject("course"), CourseInfo.class);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ServerException("queryCourseById");
 		}
 	}
@@ -147,7 +151,7 @@ private String host;
 		try {
 			JSONObject jsonCourses = sendRequest(uri, json.toString());
 			CourseInfo[] schedule = (CourseInfo[]) JSONArray.toArray(jsonCourses.getJSONArray("courses"), CourseInfo.class);
-			//CourseInfo[] schedule = (CourseInfo[]) JSONObject.toBean(jsonCourses.getJSONObject("courses"), CourseInfo[].class);
+			//CourseInfo[] schedule = (CourseInfo[]) JSONArray.toArray((JSONArray)jsonCourses.get("courses"), CourseInfo.class);
 			if (schedule == null) {
 				throw new ServerException("querySchedule");
 			}
@@ -221,6 +225,7 @@ private String host;
 		HttpPost httpPost = new HttpPost(uri);
 		CloseableHttpResponse response = null;
 		try {
+			//StringEntity requestEntity = new StringEntity(content, ContentType.create("application/json", Consts.UTF_8));
 			StringEntity requestEntity = new StringEntity(content);
 			httpPost.setEntity(requestEntity);
 			response = httpClient.execute(httpPost);
@@ -228,6 +233,7 @@ private String host;
 			HttpEntity responseEntity = response.getEntity();
 			return JSONObject.fromObject(EntityUtils.toString(responseEntity, "UTF-8"));
 		} catch (Exception e){
+			e.printStackTrace();
 			throw new ServerException("");
 		} finally {
 			if (response != null) {
